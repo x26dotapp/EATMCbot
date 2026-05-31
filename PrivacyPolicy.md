@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: May 30, 2026
+Effective date: May 31, 2026
 
 Bot: EarthALiEN Mission Control Bot / @EATMCbot
 
