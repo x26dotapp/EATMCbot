@@ -1,0 +1,13 @@
+{
+  "name": "eatmcbot-source",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Starter source for EarthALiEN Mission Control Bot.",
+  "scripts": {
+    "start": "node src/bot.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
