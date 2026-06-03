@@ -1,6 +1,10 @@
+import { parseAllowedGroups } from "./access-control.js";
+import { createBotHandlers } from "./bot-handlers.js";
+
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const botName = process.env.BOT_NAME || "EarthALiEN Mission Control";
 const keepLimit = Number.parseInt(process.env.ALERT_KEEP_LIMIT || "10", 10);
+const allowedGroups = parseAllowedGroups(process.env.ALLOWED_TELEGRAM_GROUPS);
 
 if (!token || token === "replace_with_your_bot_token") {
   console.error("Missing TELEGRAM_BOT_TOKEN. Set it in your environment or local .env runner.");
@@ -9,21 +13,6 @@ if (!token || token === "replace_with_your_bot_token") {
 
 const apiBase = `https://api.telegram.org/bot${token}`;
 let offset = 0;
-
-const helpText = [
-  `${botName}`,
-  "",
-  "Commands:",
-  "/orbit - Show current token price and status",
-  "/buys - Show the latest buys",
-  "/radar - Scan tracked token activity",
-  "/set_token - Set the group token contract",
-  "/tokens - List tracked tokens",
-  "/settings - Configure alerts and cleanup",
-  "/help - Show bot commands",
-  "",
-  `Clean chat target: keep the latest ${keepLimit} buy alerts visible when cleanup is enabled.`
-].join("\n");
 
 async function telegram(method, payload = {}) {
   const response = await fetch(`${apiBase}/${method}`, {
@@ -47,48 +36,19 @@ async function sendMessage(chatId, text) {
   });
 }
 
-async function handleMessage(message) {
-  const chatId = message.chat?.id;
-  const text = message.text?.trim();
-
-  if (!chatId || !text) return;
-
-  const command = text.split(/\s+/)[0].split("@")[0].toLowerCase();
-
-  if (command === "/start" || command === "/help") {
-    await sendMessage(chatId, helpText);
-    return;
-  }
-
-  if (command === "/orbit") {
-    await sendMessage(chatId, "Orbit scan placeholder: price and launch status feed is not connected yet.");
-    return;
-  }
-
-  if (command === "/buys") {
-    await sendMessage(chatId, `Buy feed placeholder: latest ${keepLimit} buys will appear here once tracking is connected.`);
-    return;
-  }
-
-  if (command === "/radar") {
-    await sendMessage(chatId, "Radar placeholder: token activity scanner is not connected yet.");
-    return;
-  }
-
-  if (command === "/set_token") {
-    await sendMessage(chatId, "Token setup placeholder: persistent group settings are not connected yet.");
-    return;
-  }
-
-  if (command === "/tokens") {
-    await sendMessage(chatId, "Tracked tokens placeholder: no persistent token registry is connected yet.");
-    return;
-  }
-
-  if (command === "/settings") {
-    await sendMessage(chatId, `Settings placeholder: alert cleanup target is ${keepLimit} recent buy alerts.`);
-  }
+async function leaveChat(chatId) {
+  return telegram("leaveChat", {
+    chat_id: chatId
+  });
 }
+
+const handlers = createBotHandlers({
+  allowedGroups,
+  botName,
+  keepLimit,
+  sendMessage,
+  leaveChat
+});
 
 async function poll() {
   while (true) {
@@ -96,12 +56,12 @@ async function poll() {
       const updates = await telegram("getUpdates", {
         offset,
         timeout: 30,
-        allowed_updates: ["message"]
+        allowed_updates: ["message", "my_chat_member"]
       });
 
       for (const update of updates) {
         offset = update.update_id + 1;
-        await handleMessage(update.message);
+        await handlers.handleUpdate(update);
       }
     } catch (error) {
       console.error(error.message);

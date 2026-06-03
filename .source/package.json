@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Starter source for EarthALiEN Mission Control Bot.",
   "scripts": {
-    "start": "node src/bot.js"
+    "start": "node src/bot.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"

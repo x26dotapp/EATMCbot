@@ -9,6 +9,7 @@ It is designed to act like a friendly launchpad-aware market bot for tokens that
 ## What It Does
 
 - Tracks early token activity for EarthALiENtim communities.
+- Stays limited to official EarthALiENtim Telegram groups.
 - Shows current token price/status when requested.
 - Displays recent buys while keeping the chat clean.
 - Keeps only a limited recent alert history instead of endless buy spam.
@@ -37,6 +38,15 @@ These are the planned public commands for the bot:
 4. Give the bot permission to post messages.
 5. Use `/set_token` to configure the token for the group.
 6. Use `/orbit`, `/buys`, or `/radar` to check activity.
+
+The current public source is configured for official groups only:
+
+```text
+@EarthALiENtim
+@EarthALiENspace
+```
+
+If the bot is added to another group, it leaves by itself.
 
 For clean chat behavior, the bot is intended to keep only the newest buy/activity messages visible, such as the latest 10 buy alerts, and remove older bot alerts when possible.
 
